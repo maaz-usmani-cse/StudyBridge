@@ -1,0 +1,24 @@
+# Virtual Environment
+env/
+
+# Sensitive Secrets & API Keys
+.env
+
+# Python Compiled Files & Cache
+__pycache__/
+*.pyc
+
+# Local Database & SQLite Backups
+*.sqlite3
+*.db
+
+# Collected Static & User Uploaded Media
+staticfiles/
+media/
+
+# VS Code & PyCharm IDE Settings
+.vscode/
+.idea/
+
+# Error & Debug Logs
+*.log

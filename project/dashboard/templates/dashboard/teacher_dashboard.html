@@ -1,0 +1,195 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Teacher Portal | Study Bridge{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .portal-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+    .hero-banner {
+        background: linear-gradient(135deg, #7e22ce 0%, #4c1d95 100%);
+        color: white;
+        border-radius: 20px;
+    }
+    .badge-purple {
+        background-color: #f3e8ff;
+        color: #7e22ce;
+        border: 1px solid #d8b4fe;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-md-5 py-4">
+
+    <!-- HERO WELCOME BANNER -->
+    <div class="hero-banner p-4 p-md-5 mb-4 shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-white fw-bold px-3 py-2 rounded-pill mb-3" style="color: #7e22ce;">
+                    <i class="bi bi-person-badge-fill me-1"></i> Faculty Member Access
+                </span>
+                <h2 class="fw-extrabold mb-2">Welcome back, {{ user_profile.full_name }}! 👨‍🏫</h2>
+                <p class="text-white-50 mb-0">Apne assigned batches manage karein aur students ke liye notes aur DPPs upload karein.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex gap-3 bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur">
+                    <div class="text-center px-2">
+                        <div class="small text-white-50">Assigned Batches</div>
+                        <div class="fw-bold fs-3 text-white">{{ total_batches }}</div>
+                    </div>
+                    <div class="border-start border-white border-opacity-25 ps-3 text-center px-2">
+                        <div class="small text-white-50">Total Uploads</div>
+                        <div class="fw-bold fs-3 text-white">{{ total_notes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN: ASSIGNED BATCHES & UPLOAD FORM -->
+        <div class="col-lg-5">
+
+            <!-- 1. MY ASSIGNED BATCHES (#my-batches) -->
+            <div class="card portal-card p-4 bg-white mb-4" id="my-batches">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-journal-text text-primary me-2"></i>Assigned Batches
+                    </h5>
+                    <span class="badge badge-purple rounded-pill px-3">{{ total_batches }} Active</span>
+                </div>
+                <p class="text-muted small mb-3">Dedi (Owner) dwara aapko assign kiye gaye classes aur timings:</p>
+
+                <div class="list-group list-group-flush gap-2">
+                    {% for batch in my_batches %}
+                    <div class="list-group-item border rounded-3 p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark fs-6">{{ batch.batch_name }}</span>
+                            <span class="badge bg-primary-subtle text-primary fw-bold">{{ batch.timing }}</span>
+                        </div>
+                        <small class="text-muted d-block"><i class="bi bi-book me-1"></i>Subject: {{ batch.subject }}</small>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-info-circle fs-3 d-block mb-2 text-secondary"></i>
+                        Aapko abhi koi batch assign nahi hua hai. Admin Panel se batch link karayein.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 2. UPLOAD STUDY MATERIAL FORM (#upload-notes) -->
+            <div class="card portal-card p-4 bg-white" id="upload-notes">
+                <h5 class="fw-bold text-dark mb-1">
+                    <i class="bi bi-file-earmark-pdf text-purple me-2" style="color: #7e22ce;"></i>Upload Study Material
+                </h5>
+                <p class="text-muted small mb-3">PDF Select karke student portal par live bhejein:</p>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="upload_note" value="1">
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Document / Note Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Physics Ch-1 Electrostatics Notes" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">Target Batch</label>
+                        <select name="batch" class="form-select" required>
+                            <option value="" selected disabled>-- Select Assigned Batch --</option>
+                            {% for batch in my_batches %}
+                                <option value="{{ batch.id }}">{{ batch.batch_name }} ({{ batch.subject }})</option>
+                            {% empty %}
+                                <option value="" disabled>Pehle Admin Se Batch Assign Karwayein</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-secondary">PDF File Select Karein</label>
+                        <input type="file" name="pdf_file" class="form-control" accept="application/pdf" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 py-2 shadow-sm" {% if not my_batches %}disabled{% endif %}>
+                        <i class="bi bi-cloud-upload me-1"></i> Upload Material
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: UPLOADED DOCUMENTS HISTORY (#uploaded-history) -->
+        <div class="col-lg-7">
+            <div class="card portal-card p-4 bg-white h-100" id="uploaded-history">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-clock-history text-danger me-2"></i>Uploaded Document Log
+                    </h5>
+                    <span class="badge bg-light text-dark border px-3">{{ total_notes }} Files</span>
+                </div>
+                <p class="text-muted small mb-4">Aapke dwara upload kiye gaye saare study materials ki list:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light">
+                            <tr class="small text-secondary">
+                                <th>TITLE</th>
+                                <th>BATCH</th>
+                                <th>UPLOADED DATE</th>
+                                <th class="text-end">ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in my_notes %}
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    <i class="bi bi-file-pdf-fill text-danger me-2 fs-5 align-middle"></i>
+                                    <span>{{ note.title }}</span>
+                                </td>
+                                <td><span class="badge bg-secondary-subtle text-secondary border fw-semibold">{{ note.batch.batch_name }}</span></td>
+                                <td class="small text-muted">{{ note.created_at|date:"d M Y, h:i A" }}</td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <!-- Open PDF -->
+                                        <a href="{{ note.pdf_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold rounded-2" title="View PDF">
+                                            <i class="bi bi-eye-fill"></i>
+                                        </a>
+
+                                        <!-- Delete PDF Form -->
+                                        <form method="POST" class="d-inline" onsubmit="return confirm('Kya aap is note ko delete karna chahte hain?');">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="delete_note_id" value="{{ note.id }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold rounded-2" title="Delete Note">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
+                                    Aapne abhi tak koi document upload nahi kiya hai.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

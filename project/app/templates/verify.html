@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - Elite Authentication</title>
+    
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Premium Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+
+        /* Glassmorphism Premium Card Box */
+        .otp-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Industry Standard OTP Input Fields */
+        .otp-input {
+            width: 100%;
+            height: 56px;
+            background-color: rgba(30, 41, 59, 0.5) !important;
+            border: 1px solid rgba(100, 116, 139, 0.3) !important;
+            color: #ffffff !important;
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 12px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .otp-input:focus {
+            border-color: #c084fc !important;
+            background-color: rgba(15, 23, 42, 0.9) !important;
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.25) !important;
+            outline: none;
+        }
+
+        /* Submit Button with Gradient Accent */
+        .submit-btn {
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            border: none;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 13px;
+            border-radius: 10px;
+            width: 100%;
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #b55fe6 0%, #4f46e5 100%);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+        }
+
+        .text-purple-link {
+            color: #a855f7;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .text-purple-link:hover {
+            color: #c084fc;
+            text-decoration: underline;
+        }
+
+        /* Clean Customized Alerts to keep VS Code happy */
+        .custom-error-alert {
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #f87171; 
+            background: rgba(248, 113, 113, 0.1); 
+            border: 1px solid rgba(248, 113, 113, 0.2);
+        }
+
+        .custom-success-alert {
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4ade80; 
+            background: rgba(74, 222, 128, 0.1); 
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center py-5">
+
+    <!-- 🚀 HIDDEN FORM FOR SECURE POST BASED RESEND PROCESSING -->
+    <form id="resend-otp-form" method="POST" action="{% url 'resend_otp' %}" class="d-none">
+        {% csrf_token %}
+    </form>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+                
+                <div class="otp-card">
+                    
+                    <!-- Header Section -->
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); border-radius: 14px;">
+                            <i class="bi bi-patch-check-fill text-white fs-4"></i>
+                        </div>
+                        <h1 class="fw-bold mb-1" style="font-size: 26px; color: #ffffff;">Verify OTP</h1>
+                        <p style="color: #94a3b8; font-size: 14px;">We've sent a 6-digit verification code to your email.</p>
+                    </div>
+
+                    <!-- 🛠️ CONTEXT FIELDS: Error Handling -->
+                    {% if error %}
+                        <div class="alert custom-error-alert text-center mb-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Context Fields: Success Handling -->
+                    {% if success %}
+                        <div class="alert custom-success-alert text-center mb-3">
+                            <i class="bi bi-check-circle-fill me-2"></i>{{ success }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Django Messages Framework Dynamic Render Block (Without Inline Style Logic) -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if message.tags == 'error' %}
+                                <div class="alert custom-error-alert text-center mb-3">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+                                </div>
+                            {% else %}
+                                <div class="alert custom-success-alert text-center mb-3">
+                                    <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Form Layout -->
+                    <form method="POST" action="" autocomplete="off">
+                        {% csrf_token %}
+                        
+                        <!-- 6 Separate Box Digits Inputs Row -->
+                        <div class="row g-2 mb-4 text-center">
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                            <div class="col-2"><input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric"></div>
+                        </div>
+
+                        <!-- Django Hidden Field Holder Binder -->
+                        <input type="hidden" name="otp_code" id="final_otp">
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn mb-4">
+                            Verify & Activate Account
+                        </button>
+
+                        <!-- FIXED: Dynamic Resend OTP Link Component Mapping via POST execution trigger -->
+                        <div class="text-center small mb-2" style="color: #94a3b8;">
+                            Didn't receive the code? 
+                            <span id="timer-box" class="fw-medium text-white ms-1">Resend in <span id="countdown">30</span>s</span>
+                            
+                            <!-- JavaScript Form submission trigger logic attached safely -->
+                            <a href="#" id="resend-btn" class="text-purple-link d-none fw-semibold ms-1" 
+                               onclick="event.preventDefault(); document.getElementById('resend-otp-form').submit();">
+                               Resend OTP
+                            </a>
+                        </div>
+
+                        <!-- FIXED: Dynamic Return-Back Navigation to Signup Route -->
+                        <div class="text-center mt-3">
+                            <a href="{% url 'signup' %}" class="text-purple-link small" style="font-size: 13px; color: #64748b;">
+                                <i class="bi bi-pencil-square me-1"></i> Wrong details? Change Email
+                            </a>
+                        </div>
+
+                    </form>
+                </div> <!-- /otp-card -->
+                
+            </div> <!-- /col -->
+        </div> <!-- /row -->
+    </div> <!-- /container -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Auto-Tabbing & Countdown Timer Logic -->
+    <script>
+        const inputs = document.querySelectorAll('.otp-input');
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (index < inputs.length - 1) inputs[index + 1].focus();
+                } else if (e.key === 'Backspace') {
+                    if (index > 0) inputs[index - 1].focus();
+                }
+                
+                // Realtime concatenation synchronization layer
+                updateFinalOtp();
+            });
+
+            // Handle paste action smoothly
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pasteData = e.clipboardData.getData('text').trim();
+                if (/^\d{6}$/.test(pasteData)) {
+                    inputs.forEach((inBox, idx) => {
+                        inBox.value = pasteData[idx];
+                    });
+                    updateFinalOtp();
+                    inputs[inputs.length - 1].focus();
+                }
+            });
+        });
+
+        function updateFinalOtp() {
+            let combinedOtp = "";
+            inputs.forEach(i => combinedOtp += i.value);
+            document.getElementById('final_otp').value = combinedOtp;
+        }
+
+        // 30 Seconds Timer Block Configuration
+        let timeRemaining = 30;
+        const countdownElement = document.getElementById('countdown');
+        const timerBox = document.getElementById('timer-box');
+        const resendBtn = document.getElementById('resend-btn');
+
+        const interval = setInterval(() => {
+            timeRemaining--;
+            if (countdownElement) {
+                countdownElement.textContent = timeRemaining;
+            }
+            if (timeRemaining <= 0) {
+                clearInterval(interval);
+                timerBox.classList.add('d-none');     
+                resendBtn.classList.remove('d-none'); 
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

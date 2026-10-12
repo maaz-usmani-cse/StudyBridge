@@ -1,0 +1,162 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Student Portal | Study Bridge{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .portal-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+    .student-hero-banner {
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+        color: white;
+        border-radius: 20px;
+    }
+    .badge-student-accent {
+        background-color: #e0f2fe;
+        color: #0369a1;
+        border: 1px solid #7dd3fc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-md-5 py-4">
+
+    <!-- HERO BANNER -->
+    <div class="student-hero-banner p-4 p-md-5 mb-4 shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-white fw-bold px-3 py-2 rounded-pill mb-3" style="color: #0369a1;">
+                    <i class="bi bi-mortarboard-fill me-1"></i> Student Portal Active
+                </span>
+                <h2 class="fw-extrabold mb-2">Padhai Kaisi Chal Rahi Hai, {{ user_profile.full_name }}? 📚</h2>
+                <p class="text-white-50 mb-0">Yahan se aap apne batches ki timing, teachers aur uploaded DPPs/Notes access kar sakte hain.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex gap-3 bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur">
+                    <div class="text-center px-2">
+                        <div class="small text-white-50">Active Batches</div>
+                        <div class="fw-bold fs-3 text-white">{{ total_batches }}</div>
+                    </div>
+                    <div class="border-start border-white border-opacity-25 ps-3 text-center px-2">
+                        <div class="small text-white-50">Available Notes</div>
+                        <div class="fw-bold fs-3 text-white">{{ total_notes }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN: CLASS SCHEDULE & ENROLLED BATCHES (#schedule) -->
+        <div class="col-lg-5">
+            <div class="card portal-card p-4 bg-white" id="schedule">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-clock-history text-primary me-2"></i>Class Schedule & Batches
+                    </h5>
+                    <span class="badge badge-student-accent rounded-pill px-3">{{ total_batches }} Enrolled</span>
+                </div>
+                <p class="text-muted small mb-3">Aapke registered classes aur faculty details:</p>
+
+                <div class="list-group list-group-flush gap-3">
+                    {% for batch in my_batches %}
+                    <div class="list-group-item border rounded-3 p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">{{ batch.batch_name }}</h6>
+                                <span class="badge bg-primary-subtle text-primary border fw-semibold">{{ batch.subject }}</span>
+                            </div>
+                            <span class="badge bg-dark text-white px-2 py-1 small">
+                                <i class="bi bi-alarm me-1"></i>{{ batch.timing }}
+                            </span>
+                        </div>
+                        <div class="small text-muted border-top pt-2 mt-2 d-flex align-items-center justify-content-between">
+                            <span><i class="bi bi-person-badge text-secondary me-1"></i>Teacher:</span>
+                            <span class="fw-semibold text-dark">
+                                {% if batch.teacher %}
+                                    {{ batch.teacher.full_name }}
+                                {% else %}
+                                    Not Assigned
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-folder-x fs-2 d-block mb-2 text-secondary"></i>
+                        Aap abhi kisi batch me enrolled nahi hain. Center Head se batch allot karwayein.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: NOTES & DPPS DOWNLOAD LOG (#notes) -->
+        <div class="col-lg-7">
+            <div class="card portal-card p-4 bg-white h-100" id="notes">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-file-earmark-arrow-down text-danger me-2"></i>Study Material & DPPs
+                    </h5>
+                    <span class="badge bg-light text-dark border px-3">{{ total_notes }} Materials</span>
+                </div>
+                <p class="text-muted small mb-4">Aapke teachers dwara upload kiye gaye practice sheets aur notes:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light">
+                            <tr class="small text-secondary">
+                                <th>TITLE</th>
+                                <th>BATCH</th>
+                                <th>TEACHER</th>
+                                <th class="text-end">DOWNLOAD</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for note in notes %}
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    <i class="bi bi-file-earmark-pdf-fill text-danger me-2 fs-5 align-middle"></i>
+                                    <span>{{ note.title }}</span>
+                                    <div class="small text-muted fw-normal">{{ note.created_at|date:"d M Y" }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary-subtle text-secondary border fw-semibold">
+                                        {{ note.batch.batch_name }}
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    {{ note.uploaded_by.full_name }}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ note.pdf_file.url }}" target="_blank" class="btn btn-sm btn-outline-primary fw-bold rounded-2 px-3">
+                                        <i class="bi bi-download me-1"></i> View / PDF
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-journal-x fs-1 d-block mb-2 text-secondary"></i>
+                                    Aapke batch ke liye abhi koi study material upload nahi hua hai.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

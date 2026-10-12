@@ -1,0 +1,185 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Parent Portal | Study Bridge{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .portal-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+    .parent-hero-banner {
+        background: linear-gradient(135deg, #15803d 0%, #166534 100%);
+        color: white;
+        border-radius: 20px;
+    }
+    .badge-parent-accent {
+        background-color: #dcfce7;
+        color: #15803d;
+        border: 1px solid #86efac;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-md-5 py-4">
+
+    <!-- HERO WELCOME BANNER -->
+    <div class="parent-hero-banner p-4 p-md-5 mb-4 shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-white fw-bold px-3 py-2 rounded-pill mb-3" style="color: #15803d;">
+                    <i class="bi bi-people-fill me-1"></i> Parent Portal Active
+                </span>
+                <h2 class="fw-extrabold mb-2">Namaste, {{ user_profile.full_name }} Ji! 👨‍👩‍👦</h2>
+                {% if child %}
+                    <p class="text-white-50 mb-0">
+                        Aap yahan se apne bache <strong>{{ child.full_name }}</strong> (@{{ child.username }}) ki class timings, batch details aur fee records track kar sakte hain.
+                    </p>
+                {% else %}
+                    <p class="text-white-50 mb-0">Abhi aapki profile ke sath koi student account link nahi hua hai. Coaching administration se contact karein.</p>
+                {% endif %}
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <div class="d-inline-flex gap-3 bg-white bg-opacity-10 p-3 rounded-4 backdrop-blur">
+                    <div class="text-center px-2">
+                        <div class="small text-white-50">Enrolled Batches</div>
+                        <div class="fw-bold fs-3 text-white">{{ total_batches }}</div>
+                    </div>
+                    <div class="border-start border-white border-opacity-25 ps-3 text-center px-2">
+                        <div class="small text-white-50">Pending Dues</div>
+                        <div class="fw-bold fs-3 text-white">₹{{ total_fee_due }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if child %}
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN: CHILD ENROLLED BATCHES (#child-progress) -->
+        <div class="col-lg-6">
+            <div class="card portal-card p-4 bg-white h-100" id="child-progress">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-journal-check text-success me-2"></i>{{ child.full_name }} Ke Active Batches
+                    </h5>
+                    <span class="badge badge-parent-accent rounded-pill px-3">{{ total_batches }} Classes</span>
+                </div>
+                <p class="text-muted small mb-3">Bache ki class schedule aur faculty information:</p>
+
+                <div class="list-group list-group-flush gap-3">
+                    {% for batch in child_batches %}
+                    <div class="list-group-item border rounded-3 p-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">{{ batch.batch_name }}</h6>
+                                <span class="badge bg-success-subtle text-success border fw-semibold">{{ batch.subject }}</span>
+                            </div>
+                            <span class="badge bg-dark text-white px-2 py-1 small">
+                                <i class="bi bi-clock me-1"></i>{{ batch.timing }}
+                            </span>
+                        </div>
+                        <div class="small text-muted border-top pt-2 mt-2 d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-person-badge text-secondary me-1"></i>Faculty Member:</span>
+                            <span class="fw-semibold text-dark">
+                                {% if batch.teacher %}
+                                    {{ batch.teacher.full_name }}
+                                {% else %}
+                                    Not Assigned
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted small">
+                        <i class="bi bi-exclamation-circle fs-3 d-block mb-2 text-secondary"></i>
+                        Bacha abhi kisi batch me enrolled nahi hai.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: FEE HISTORY & STATUS (#fee-status) -->
+        <div class="col-lg-6">
+            <div class="card portal-card p-4 bg-white h-100" id="fee-status">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-receipt text-primary me-2"></i>Fee Receipts & Status
+                    </h5>
+                    {% if total_fee_due > 0 %}
+                        <span class="badge bg-danger-subtle text-danger border px-3">Pending: ₹{{ total_fee_due }}</span>
+                    {% else %}
+                        <span class="badge bg-success-subtle text-success border px-3">All Clear</span>
+                    {% endif %}
+                </div>
+                <p class="text-muted small mb-4">Coaching tuition fee record aur payment status:</p>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light">
+                            <tr class="small text-secondary">
+                                <th>MONTH</th>
+                                <th>AMOUNT</th>
+                                <th>PAID DATE</th>
+                                <th class="text-end">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in fee_records %}
+                            <tr>
+                                <td class="fw-bold text-dark">
+                                    {{ record.month|default:"Tuition Fee" }}
+                                </td>
+                                <td class="fw-bold">₹{{ record.amount }}</td>
+                                <td class="small text-muted">
+                                    {% if record.paid_date %}
+                                        {{ record.paid_date|date:"d M Y" }}
+                                    {% else %}
+                                        <span class="text-secondary">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    {% if record.is_paid %}
+                                        <span class="badge bg-success-subtle text-success border px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Paid
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning border px-2 py-1">
+                                            <i class="bi bi-hourglass-split me-1"></i> Pending
+                                        </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="bi bi-folder2-open fs-2 d-block mb-2 text-secondary"></i>
+                                    Abhi tak koi fee record upload nahi kiya gaya hai.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <!-- EMPTY STATE IF NO CHILD IS LINKED -->
+    <div class="card portal-card p-5 bg-white text-center">
+        <i class="bi bi-person-slash fs-1 text-secondary mb-3"></i>
+        <h5 class="fw-bold text-dark">Koi Bacha (Student) Link Nahi Mila</h5>
+        <p class="text-muted small mb-0">Aapke profile ke sath student account connect nahi hai. Kripya administration se contact karein.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

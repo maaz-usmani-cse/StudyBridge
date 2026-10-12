@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Bridge | Premium Tuition & Academy (Class 1st to 12th)</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --brand-primary: #6366f1;
+            --brand-primary-dark: #4f46e5;
+            --brand-secondary: #06b6d4;
+            --brand-accent: #f59e0b;
+            --brand-success: #10b981;
+            --brand-purple: #8b5cf6;
+            --brand-dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* TOP MINI ANNOUNCEMENT HEADER */
+        .top-announcement-bar {
+            background: #0f172a;
+            color: #94a3b8;
+            font-size: 0.82rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* FULL-WIDTH VIBRANT NAVBAR */
+        .navbar-colorful {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #06b6d4 100%);
+            box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1050 !important;
+        }
+
+        .navbar-colorful .nav-link {
+            color: rgba(255, 255, 255, 0.95) !important;
+            font-weight: 600;
+            padding: 8px 14px !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+
+        .navbar-colorful .nav-link:hover, .navbar-colorful .nav-link.active {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        /* MOBILE MENU TOGGLE FIX */
+        #mobile-menu-checkbox {
+            display: none !important;
+        }
+
+        @media (max-width: 1199.98px) {
+            .navbar-collapse {
+                display: none;
+            }
+
+            #mobile-menu-checkbox:checked ~ .navbar-collapse {
+                display: block !important;
+                background: #0f172a !important;
+                border-radius: 16px;
+                padding: 20px;
+                margin-top: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        .btn-nav-login {
+            background: #ffffff;
+            color: #4f46e5;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 7px 18px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.88rem;
+            text-decoration: none;
+        }
+
+        .btn-nav-signup {
+            background: #10b981;
+            color: #ffffff;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 7px 18px;
+            border: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.88rem;
+            text-decoration: none;
+        }
+
+        .hero-wrapper {
+            background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.08) 50%, rgba(248, 250, 252, 1) 100%);
+            padding: 80px 0 60px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-img {
+            border-radius: 28px;
+            object-fit: cover;
+            width: 100%;
+            max-height: 480px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        }
+
+        .batch-card {
+            border: none;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            border-top: 5px solid #4f46e5;
+            transition: all 0.3s ease;
+        }
+        .batch-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-control-custom, .form-select-custom {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+        .form-control-custom:focus, .form-select-custom:focus {
+            border-color: #6366f1;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .section-badge {
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--brand-primary-dark);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .footer-dark {
+            background-color: #0b0f19;
+            color: #94a3b8;
+        }
+
+        .footer-dark a {
+            color: #cbd5e1;
+            text-decoration: none;
+        }
+
+        .developer-badge {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP MINI ANNOUNCEMENT HEADER -->
+    <div class="top-announcement-bar py-2 d-none d-md-block">
+        <div class="container-fluid px-3 px-lg-4 d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-warning text-dark me-2">ADMISSIONS OPEN 2026-27</span>
+                <small class="text-light">Class 1st to 12th Batch Registration Active!</small>
+            </div>
+            <div class="d-flex gap-3">
+                <span><i class="bi bi-geo-alt-fill text-warning me-1"></i> Home & Group Tuition</span>
+                <span><i class="bi bi-clock-fill text-info me-1"></i> Morning / Evening Slots</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. FULL-WIDTH RESPONSIVE NAVBAR -->
+    <nav class="navbar navbar-expand-xl navbar-colorful py-2.5">
+        <div class="container-fluid px-3 px-lg-4">
+            <!-- Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-extrabold fs-4 text-white me-2 me-xl-4" href="#">
+                <span class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px;">
+                    <i class="bi bi-mortarboard-fill fs-6"></i>
+                </span>
+                <span class="fs-4">STUDY <span class="text-warning">BRIDGE</span></span>
+            </a>
+
+            <!-- Pure CSS Toggle Checkbox (Invisible) -->
+            <input type="checkbox" id="mobile-menu-checkbox">
+
+            <!-- Hamburger Icon linked to Checkbox -->
+            <label for="mobile-menu-checkbox" class="d-xl-none border-0 text-white p-1" style="cursor: pointer;">
+                <i class="bi bi-list fs-1 text-white"></i>
+            </label>
+
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-xl-0 gap-xl-1 text-uppercase my-2 my-xl-0">
+                    <li class="nav-item"><a class="nav-link active" href="#about"><i class="bi bi-house-door-fill me-1"></i> About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#features"><i class="bi bi-star-fill me-1"></i> Features</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#batches"><i class="bi bi-book-half me-1"></i> Batches & Timings</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#notices"><i class="bi bi-megaphone-fill me-1"></i> Notice Board</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#inquiry"><i class="bi bi-pencil-square me-1"></i> Inquiry Form</a></li>
+                </ul>
+
+                <!-- Right Corner Auth Actions -->
+                <div class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 mt-2 mt-xl-0">
+                    <a href="{% url 'signup' %}" class="btn btn-nav-signup text-center d-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-person-plus-fill"></i> Sign Up
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-nav-login text-center d-flex align-items-center justify-content-center gap-1">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- DYNAMIC DJANGO MESSAGES -->
+    {% if messages %}
+        <div class="container-fluid px-3 px-lg-4 mt-2">
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show fw-bold text-center border-0 shadow-sm" role="alert">
+                    🎉 {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- 2. HERO SECTION -->
+    <section class="hero-wrapper" id="about">
+        <div class="container">
+            <div class="row align-items-center gy-5">
+                <div class="col-lg-6">
+                    <span class="section-badge mb-3">
+                        <i class="bi bi-stars text-warning me-1"></i> Quality Education At Home
+                    </span>
+                    <h1 class="display-4 fw-extrabold text-dark mb-3 lh-sm">
+                        Bridging Education for <span class="gradient-text">Class 1st to 12th</span> Students
+                    </h1>
+                    <p class="fs-5 text-secondary mb-4 lh-lg">
+                        Structured learning, small batches, dedicated daily doubt resolution, and complete fee transparency for parents.
+                    </p>
+                    
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <a href="#inquiry" class="btn btn-success btn-lg fw-bold rounded-3 px-4 shadow">
+                            <i class="bi bi-pencil-square me-2"></i> Book Free Demo Class
+                        </a>
+                        <a href="#batches" class="btn btn-outline-primary btn-lg fw-bold rounded-3 px-4">
+                            <i class="bi bi-collection-play me-2"></i> View Active Batches
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=1000&auto=format&fit=crop" 
+                         alt="Tuition Class Teaching" class="hero-img">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. FEATURES SECTION -->
+    <section class="py-5 bg-white" id="features">
+        <div class="container py-4">
+            <div class="text-center max-w-2xl mx-auto mb-5">
+                <span class="section-badge mb-2">Key Features</span>
+                <h2 class="fw-extrabold fs-1 text-dark">Why Parents Trust Study Bridge</h2>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded-4 border h-100">
+                        <div class="p-3 bg-primary text-white rounded-3 d-inline-block mb-3 fs-3"><i class="bi bi-people-fill"></i></div>
+                        <h5 class="fw-bold">Limited Batch Size</h5>
+                        <p class="text-secondary small mb-0">Every student gets direct interaction so no child feels left behind during lectures.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded-4 border h-100">
+                        <div class="p-3 bg-success text-white rounded-3 d-inline-block mb-3 fs-3"><i class="bi bi-journal-check"></i></div>
+                        <h5 class="fw-bold">Weekly Mock Tests</h5>
+                        <p class="text-secondary small mb-0">Regular topic-wise assessments with instant test score tracking shared with parents.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4 bg-light rounded-4 border h-100">
+                        <div class="p-3 bg-warning text-white rounded-3 d-inline-block mb-3 fs-3"><i class="bi bi-receipt-cutoff"></i></div>
+                        <h5 class="fw-bold">Online Fee Management</h5>
+                        <p class="text-secondary small mb-0">Transparent monthly fee logging, due reminders, and instant digital receipt generation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. DYNAMIC BATCHES & TIMINGS SECTION -->
+    <section class="py-5 bg-light" id="batches">
+        <div class="container py-4">
+            <div class="text-center max-w-2xl mx-auto mb-5">
+                <span class="section-badge mb-2">Active Batches</span>
+                <h2 class="fw-extrabold fs-1 text-dark">Running Classes & Batch Timings</h2>
+                <p class="text-muted">Direct coaching schedules managed by Center Administration</p>
+            </div>
+
+            <div class="row g-4">
+                {% for batch in batches %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="batch-card p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-primary-subtle text-primary border px-3 py-1 rounded-pill fw-bold">
+                                    {{ batch.subject }}
+                                </span>
+                                <span class="small text-muted fw-semibold">
+                                    <i class="bi bi-clock-fill text-warning me-1"></i>{{ batch.timing }}
+                                </span>
+                            </div>
+
+                            <h4 class="fw-bold text-dark my-2">{{ batch.batch_name }}</h4>
+
+                            <div class="small text-muted mt-3 pt-2 border-top">
+                                <i class="bi bi-person-badge-fill text-indigo me-1"></i>Faculty:
+                                <strong class="text-dark">
+                                    {% if batch.teacher %}
+                                        {{ batch.teacher.full_name }}
+                                    {% else %}
+                                        Assigned by Center
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+
+                        <a href="#inquiry" class="btn btn-outline-primary w-100 rounded-3 fw-bold mt-4">
+                            Inquire for This Batch
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-journal-x fs-1 text-secondary mb-2 d-block"></i>
+                    <h5 class="fw-bold text-dark">Filhal Naye Batches Update Ho Rahe Hain</h5>
+                    <p class="text-muted small">Admissions open hain! Aap niche inquiry form bhar kar seat book kar sakte hain.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. NOTICE BOARD SECTION -->
+    <section class="py-5 bg-white" id="notices">
+        <div class="container py-4">
+            <div class="text-center max-w-2xl mx-auto mb-4">
+                <span class="section-badge mb-2">Announcements</span>
+                <h2 class="fw-extrabold fs-1 text-dark">Tuition Notice Board</h2>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="list-group shadow-sm rounded-4 overflow-hidden border">
+                        <div class="list-group-item p-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+                            <div>
+                                <span class="badge bg-danger mb-2">Upcoming Test</span>
+                                <h5 class="fw-bold mb-1">Class 10th Science Chapter 3 Mock Test</h5>
+                                <p class="text-muted small mb-0">Scheduled for this Sunday at 10:00 AM. Attendance mandatory.</p>
+                            </div>
+                            <span class="text-muted small fw-semibold">Posted: Today</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. HIGH-LEVEL COMPREHENSIVE INQUIRY FORM (Connected with Model) -->
+    <section class="py-5 bg-light" id="inquiry">
+        <div class="container py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-white">
+                        <div class="text-center mb-4">
+                            <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-bold">Admission & Inquiry Registration</span>
+                            <h2 class="fw-extrabold text-dark mt-2">Request Call Back / Free Demo</h2>
+                            <p class="text-secondary">Fill in the complete details. Di will review and contact you directly.</p>
+                        </div>
+
+                        <form action="{% url 'landing' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Student Full Name *</label>
+                                    <input type="text" name="student_name" class="form-control form-control-custom" placeholder="e.g. Rahul Sharma" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Parent / Guardian Name *</label>
+                                    <input type="text" name="parent_name" class="form-control form-control-custom" placeholder="e.g. Suresh Sharma" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Contact Mobile Number *</label>
+                                    <input type="tel" name="phone_number" class="form-control form-control-custom" placeholder="10-digit Phone Number" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">WhatsApp Number *</label>
+                                    <input type="tel" name="whatsapp_number" class="form-control form-control-custom" placeholder="WhatsApp Number for Updates" required>
+                                </div>
+<div class="col-md-6">
+    <label class="form-label fw-bold text-dark fs-7">Select Batch / Target Class *</label>
+    <select name="grade" class="form-select form-select-custom" required>
+        <option value="" selected disabled>-- Choose Running Batch or Class --</option>
+        
+        <!-- DYNAMIC BATCHES (Jo Coaching me chal rahe hain) -->
+        {% if batches %}
+        <optgroup label="🔥 Currently Active Batches">
+            {% for b in batches %}
+                <option value="{{ b.batch_name }} - {{ b.subject }} ({{ b.timing }})">
+                    {{ b.batch_name }} • {{ b.subject }} [{{ b.timing }}]
+                </option>
+            {% endfor %}
+        </optgroup>
+        {% endif %}
+
+        <!-- GENERAL CLASSES (Naye admissions ke liye) -->
+        <optgroup label="📚 General Classes (Other)">
+            <option value="Class 9th">Class 9th Foundation</option>
+            <option value="Class 10th">Class 10th Board</option>
+            <option value="Class 11th">Class 11th Science/Commerce</option>
+            <option value="Class 12th">Class 12th Board</option>
+            <option value="Junior Wing (1st-8th)">Junior Wing (Class 1st - 8th)</option>
+        </optgroup>
+    </select>
+</div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">School Name</label>
+                                    <input type="text" name="school_name" class="form-control form-control-custom" placeholder="e.g. St. Xavier's / DPS">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Subject(s) Required *</label>
+                                    <input type="text" name="subjects" class="form-control form-control-custom" placeholder="e.g. Maths, Science, All Subjects" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Tuition Mode Preference *</label>
+                                    <select name="tuition_type" class="form-select form-select-custom" required>
+                                        <option value="Group Tuition Batch">Group Tuition Batch (At Di's Centre)</option>
+                                        <option value="One-on-One Home Tuition">Personal Home Tuition</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Preferred Time Slot *</label>
+                                    <select name="preferred_slot" class="form-select form-select-custom" required>
+                                        <option value="Morning Batch">Morning Slot</option>
+                                        <option value="Afternoon Batch">Afternoon Slot</option>
+                                        <option value="Evening Batch">Evening Slot</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-dark fs-7">Locality / Area Address *</label>
+                                    <input type="text" name="address" class="form-control form-control-custom" placeholder="e.g. Indrapuri Sector C, Bhopal" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-bold text-dark fs-7">Any Specific Notes / Weak Subjects</label>
+                                    <textarea name="remarks" class="form-control form-control-custom" rows="3" placeholder="Mention if student needs special focus in any subject..."></textarea>
+                                </div>
+
+                                <div class="col-12 text-center mt-4">
+                                    <button type="submit" class="btn btn-success btn-lg w-100 fs-6 py-3 fw-bold rounded-3 shadow">
+                                        <i class="bi bi-send-fill me-2"></i> Submit Inquiry Request
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. BRANDED DEVELOPER FOOTER -->
+    <footer class="footer-dark pt-5 pb-4">
+        <div class="container">
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4 col-md-6">
+                    <h4 class="fw-extrabold text-white mb-3 d-flex align-items-center gap-2">
+                        <span class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                            <i class="bi bi-mortarboard-fill fs-6"></i>
+                        </span>
+                        STUDY BRIDGE
+                    </h4>
+                    <p class="small text-secondary mb-3 lh-lg">
+                        Empowering students from Class 1st to 12th with structured learning, personal attention, and transparent fee tracking.
+                    </p>
+                </div>
+
+                <div class="col-6 col-lg-2 col-md-3">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Quick Links</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a href="#about">About Academy</a></li>
+                        <li><a href="#features">Key Features</a></li>
+                        <li><a href="#batches">Batches & Fees</a></li>
+                        <li><a href="#notices">Notice Board</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-6 col-lg-2 col-md-3">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Portal Access</h6>
+                    <ul class="list-unstyled small d-flex flex-column gap-2">
+                        <li><a href="{% url 'login' %}">Student Login</a></li>
+                        <li><a href="{% url 'signup' %}">New Registration</a></li>
+                        <li><a href="{% url 'login' %}">Admin Portal</a></li>
+                        <li><a href="#inquiry">Inquiry Form</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h6 class="fw-bold text-white mb-3 text-uppercase fs-7">Tuition Center Contact</h6>
+                    <p class="small mb-2"><i class="bi bi-geo-alt-fill text-warning me-2"></i> Quality Coaching & Home Tuition Center</p>
+                    <p class="small mb-2"><i class="bi bi-telephone-fill text-success me-2"></i> Direct Support: Available via Portal Callback</p>
+                    <p class="small mb-0"><i class="bi bi-clock-fill text-info me-2"></i> Timings: Morning & Evening Batches</p>
+                </div>
+            </div>
+
+            <hr class="border-secondary opacity-25 my-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small">
+                <p class="mb-0 text-secondary">&copy; 2026 Study Bridge. All rights reserved.</p>
+                <div class="d-flex align-items-center gap-1">
+                    <span>Designed & Developed with ❤️ by</span>
+                    <span class="developer-badge"><i class="bi bi-code-slash me-1"></i> Maaz Usmani</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/bootstrap.bundle.min.js"></script>
+</body>
+</html>

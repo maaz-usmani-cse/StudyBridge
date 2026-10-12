@@ -1,0 +1,565 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Owner Command Center | Study Bridge{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+    .portal-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    }
+    .owner-hero-banner {
+        background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+        color: white;
+        border-radius: 20px;
+    }
+    .stat-pill {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 14px;
+        padding: 12px 20px;
+    }
+    .btn-whatsapp {
+        background-color: #25d366;
+        color: white;
+        border: none;
+        transition: 0.2s;
+    }
+    .btn-whatsapp:hover {
+        background-color: #128c7e;
+        color: white;
+    }
+    
+    /* Clean CSS classes for status dropdown (No inline syntax errors) */
+    .inq-status-select {
+        width: 110px;
+        font-size: 11.5px;
+    }
+    .status-pending {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+    .status-contacted {
+        background-color: #e0f2fe;
+        color: #0284c7;
+    }
+    .status-enrolled {
+        background-color: #dcfce7;
+        color: #15803d;
+    }
+    .status-rejected {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-md-5 py-4">
+
+    <!-- HERO BANNER -->
+    <div class="owner-hero-banner p-4 p-md-5 mb-4 shadow-sm">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge bg-white fw-bold px-3 py-2 rounded-pill mb-3" style="color: #4338ca;">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Center Head / Owner Portal
+                </span>
+                <h2 class="fw-extrabold mb-2">Welcome Back, {{ user_profile.full_name }}! 👑</h2>
+                <p class="text-white-50 mb-0">Coaching administration, batches, teachers & student access command center.</p>
+            </div>
+            <div class="col-lg-5 mt-4 mt-lg-0">
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                    <div class="stat-pill text-center">
+                        <div class="small text-white-50">Students</div>
+                        <div class="fw-bold fs-4">{{ total_students }}</div>
+                    </div>
+                    <div class="stat-pill text-center">
+                        <div class="small text-white-50">Teachers</div>
+                        <div class="fw-bold fs-4">{{ total_teachers }}</div>
+                    </div>
+                    <div class="stat-pill text-center">
+                        <div class="small text-white-50">Batches</div>
+                        <div class="fw-bold fs-4">{{ total_batches }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK ACTION BUTTONS BAR -->
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <button class="btn btn-primary rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createBatchModal">
+            <i class="bi bi-plus-circle me-1"></i> Naya Batch Banayein
+        </button>
+        <button class="btn btn-dark rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+            <i class="bi bi-person-plus-fill me-1"></i> Direct Naya Teacher Banayein
+        </button>
+        <button class="btn btn-warning rounded-pill px-3 fw-bold shadow-sm text-dark" data-bs-toggle="modal" data-bs-target="#promoteStudentModal">
+            <i class="bi bi-arrow-up-circle-fill me-1"></i> Student Ko Teacher Banayein
+        </button>
+        <button class="btn btn-success rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addFeeModal">
+            <i class="bi bi-currency-rupee me-1"></i> Add Fee Record
+        </button>
+    </div>
+
+    <!-- ROW 1: BATCHES & FEES -->
+    <div class="row g-4 mb-4">
+        
+        <!-- BATCHES OVERVIEW -->
+        <div class="col-lg-7">
+            <div class="card portal-card p-4 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-collection-fill text-primary me-2"></i>Active Batches
+                    </h5>
+                    <span class="badge bg-primary-subtle text-primary border rounded-pill px-3">{{ total_batches }} Total</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light small text-secondary">
+                            <tr>
+                                <th>BATCH NAME</th>
+                                <th>SUBJECT</th>
+                                <th>FACULTY</th>
+                                <th>TIMING</th>
+                                <th class="text-end">ENROLLED</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in all_batches %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ batch.batch_name }}</td>
+                                <td><span class="badge bg-primary-subtle text-primary border">{{ batch.subject }}</span></td>
+                                <td class="small text-muted">
+                                    {% if batch.teacher %}
+                                        {{ batch.teacher.full_name }}
+                                    {% else %}
+                                        <span class="text-warning">Unassigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="small">{{ batch.timing }}</td>
+                                <td class="text-end fw-bold">{{ batch.students.count }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted small">Koi batch active nahi hai.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- RECENT FEES -->
+        <div class="col-lg-5">
+            <div class="card portal-card p-4 bg-white h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-currency-rupee text-success me-2"></i>Recent Fees
+                    </h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light small text-secondary">
+                            <tr>
+                                <th>STUDENT</th>
+                                <th>AMOUNT</th>
+                                <th>MONTH</th>
+                                <th class="text-end">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fee in recent_fee_records %}
+                            <tr>
+                                <td class="fw-bold text-dark small">{{ fee.student.full_name }}</td>
+                                <td class="small fw-semibold">₹{{ fee.amount }}</td>
+                                <td class="small text-muted">{{ fee.month }}</td>
+                                <td class="text-end">
+                                    {% if fee.is_paid %}
+                                        <span class="badge bg-success-subtle text-success border">Paid</span>
+                                    {% else %}
+                                        <span class="badge bg-warning-subtle text-warning border">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted small">Koi fee record nahi hai.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ROW 2: ACTIVE TEACHERS LIST -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card portal-card p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-mortarboard-fill text-purple me-2" style="color: #7c3aed;"></i>Faculty Teachers List
+                    </h5>
+                    <span class="badge bg-dark rounded-pill px-3">{{ total_teachers }} Teachers</span>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light small text-secondary">
+                            <tr>
+                                <th>TEACHER NAME</th>
+                                <th>USERNAME</th>
+                                <th>MOBILE</th>
+                                <th>EMAIL</th>
+                                <th class="text-end">ROLE STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for teacher in all_teachers %}
+                            <tr>
+                                <td class="fw-bold text-dark">{{ teacher.full_name }}</td>
+                                <td class="small text-muted">@{{ teacher.username }}</td>
+                                <td class="small">{{ teacher.mobile }}</td>
+                                <td class="small text-muted">{{ teacher.email }}</td>
+                                <td class="text-end">
+                                    <span class="badge bg-purple-subtle text-purple border px-3 py-1" style="color: #6d28d9; background-color: #f5f3ff;">
+                                        <i class="bi bi-check2-circle me-1"></i> Active Faculty
+                                    </span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted small">Koi teacher add nahi kiya gaya hai.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT INQUIRIES (WITH WHATSAPP & AUTO-ENROLL) -->
+    {% if recent_inquiries %}
+    <div class="row g-4 mb-4" id="inquiries">
+        <div class="col-12">
+            <div class="card portal-card p-4 bg-white">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-envelope-paper-fill text-info me-2"></i>Recent Admission Inquiries & Leads
+                    </h5>
+                    <span class="badge bg-info-subtle text-info border rounded-pill px-3">Live Admissions Leads</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle border-top">
+                        <thead class="table-light small text-secondary">
+                            <tr>
+                                <th>STUDENT / PARENT</th>
+                                <th>CONTACT & CHAT</th>
+                                <th>CLASS & DETAILS</th>
+                                <th>STATUS</th>
+                                <th class="text-end">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inq in recent_inquiries %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark">{{ inq.student_name }}</div>
+                                    <div class="small text-muted">Parent: {{ inq.parent_name|default:"Not Provided" }}</div>
+                                    <div class="text-muted" style="font-size: 11px;">{{ inq.created_at|date:"d M Y, H:i" }}</div>
+                                </td>
+                                <td>
+                                    <!-- Direct Phone Call Link -->
+                                    <div class="fw-semibold text-dark">
+                                        <a href="tel:{{ inq.phone_number }}" class="text-decoration-none text-dark" title="Direct Call">
+                                            <i class="bi bi-telephone-fill text-primary me-1 small"></i>{{ inq.phone_number }}
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Direct Pre-filled WhatsApp Button -->
+                                    <div class="mt-1">
+                                        <a href="https://wa.me/91{{ inq.whatsapp_number|default:inq.phone_number }}?text=Hello%20{{ inq.student_name }}%20ji,%20Study%20Bridge%20Academy%20ki%20taraf%20se%20aapki%20{{ inq.grade }}%20admission%20inquiry%20mili.%20Kya%20hum%20aapse%20demo%20class%20ke%20liye%20baat%20kar%20sakte%20hain%3F" 
+                                           target="_blank" 
+                                           class="btn btn-sm btn-whatsapp rounded-pill px-2 py-0 fw-bold" 
+                                           style="font-size: 11.5px;">
+                                            <i class="bi bi-whatsapp me-1"></i> Chat on WhatsApp
+                                        </a>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary border me-1">{{ inq.grade }}</span>
+                                    <span class="small text-muted">{{ inq.subjects }}</span>
+                                    <div class="small text-muted mt-1">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ inq.tuition_type }} • {{ inq.preferred_slot }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <!-- Status Dropdown Form (Fixed syntax with clean CSS classes) -->
+                                    <form method="POST" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="update_inquiry_status" value="1">
+                                        <input type="hidden" name="inquiry_id" value="{{ inq.id }}">
+                                        <select name="status" 
+                                                class="form-select form-select-sm border-0 fw-bold rounded-pill px-2 py-1 inq-status-select {% if inq.status == 'PENDING' %}status-pending{% elif inq.status == 'CONTACTED' %}status-contacted{% elif inq.status == 'ENROLLED' %}status-enrolled{% else %}status-rejected{% endif %}" 
+                                                onchange="this.form.submit()">
+                                            <option value="PENDING" {% if inq.status == 'PENDING' %}selected{% endif %}>Pending</option>
+                                            <option value="CONTACTED" {% if inq.status == 'CONTACTED' %}selected{% endif %}>Contacted</option>
+                                            <option value="ENROLLED" {% if inq.status == 'ENROLLED' %}selected{% endif %}>Enrolled</option>
+                                            <option value="REJECTED" {% if inq.status == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td class="text-end">
+                                    {% if inq.status != 'ENROLLED' %}
+                                        <!-- 1-Click Enroll Trigger Button -->
+                                        <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#enrollModal_{{ inq.id }}">
+                                            <i class="bi bi-person-check-fill me-1"></i> Enroll & Add Batch
+                                        </button>
+                                    {% else %}
+                                        <span class="badge bg-success-subtle text-success border px-2 py-1">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Already Enrolled
+                                        </span>
+                                    {% endif %}
+
+                                    <!-- MODAL: ENROLL STUDENT TO BATCH -->
+                                    <div class="modal fade text-start" id="enrollModal_{{ inq.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 rounded-4 shadow">
+                                                <div class="modal-header border-bottom-0 pb-0">
+                                                    <h5 class="modal-title fw-bold text-dark">Enroll {{ inq.student_name }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="enroll_inquiry" value="1">
+                                                    <input type="hidden" name="inquiry_id" value="{{ inq.id }}">
+                                                    
+                                                    <div class="modal-body">
+                                                        <div class="p-3 bg-light rounded-3 mb-3 small">
+                                                            <div><strong>Student Name:</strong> {{ inq.student_name }}</div>
+                                                            <div><strong>Mobile No:</strong> {{ inq.phone_number }}</div>
+                                                            <div><strong>Interested Grade:</strong> {{ inq.grade }} ({{ inq.subjects }})</div>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold text-secondary">Assign To Running Batch *</label>
+                                                            <select class="form-select" name="batch_id" required>
+                                                                <option value="" disabled selected>-- Select Batch --</option>
+                                                                {% for b in all_batches %}
+                                                                    <option value="{{ b.id }}">{{ b.batch_name }} ({{ b.subject }} • {{ b.timing }})</option>
+                                                                {% empty %}
+                                                                    <option disabled>Koi batch available nahi hai. Pehle batch banayein.</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <p class="text-muted" style="font-size: 11px;">
+                                                            * Submit karte hi student ka account auto-create/verify hoga aur wo is batch me add ho jayega!
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer border-top-0 pt-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Confirm Enrollment</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- END MODAL -->
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted small">Koi nayi admission inquiry nahi aayi hai.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- MODAL 1: PROMOTE STUDENT TO TEACHER -->
+<div class="modal fade" id="promoteStudentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">Student Ko Teacher Banayein</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="promote_to_teacher" value="1">
+                <div class="modal-body">
+                    <p class="text-muted small">Niche registered student ko select karein. Iska role instant <strong>TEACHER</strong> ban jayega aur ye notes upload kar sakega:</p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Student Chunie</label>
+                        <select class="form-select" name="target_user_id" required>
+                            <option value="" disabled selected>-- Select Student to Promote --</option>
+                            {% for std in all_students %}
+                                <option value="{{ std.id }}">{{ std.full_name }} (@{{ std.username }} • Mob: {{ std.mobile }})</option>
+                            {% empty %}
+                                <option disabled>Koi student available nahi hai</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold">Promote to Teacher</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 2: DIRECT ADD NEW TEACHER -->
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">Direct Naya Teacher Banayein</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="create_teacher" value="1">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Teacher Full Name</label>
+                        <input type="text" class="form-control" name="teacher_name" placeholder="Prof. Rajesh Sharma" required>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Username</label>
+                            <input type="text" class="form-control" name="teacher_username" placeholder="rajesh_physics" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Mobile No</label>
+                            <input type="tel" class="form-control" name="teacher_mobile" placeholder="9876543210" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Email (Optional)</label>
+                        <input type="email" class="form-control" name="teacher_email" placeholder="rajesh@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Login Password</label>
+                        <input type="password" class="form-control" name="teacher_password" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold">Create Faculty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 3: CREATE BATCH -->
+<div class="modal fade" id="createBatchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">Naya Batch Banayein</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="create_batch" value="1">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Batch Ka Naam</label>
+                        <input type="text" class="form-control" name="batch_name" placeholder="Target JEE 2027" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Subject</label>
+                        <input type="text" class="form-control" name="subject" placeholder="Physics / Mathematics" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Batch Timing</label>
+                        <input type="text" class="form-control" name="timing" placeholder="05:00 PM - 06:30 PM" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Assign Teacher</label>
+                        <select class="form-select" name="teacher">
+                            <option value="">-- Faculty Assign Karein (Optional) --</option>
+                            {% for teacher in all_teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.full_name }} (@{{ teacher.username }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Create Batch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL 4: ADD FEE RECORD -->
+<div class="modal fade" id="addFeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold text-dark">Fee Record Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="add_fee_record" value="1">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Student Chunie</label>
+                        <select class="form-select" name="student_id" required>
+                            <option value="" disabled selected>-- Select Student --</option>
+                            {% for std in all_students %}
+                                <option value="{{ std.id }}">{{ std.full_name }} ({{ std.mobile }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Amount (₹)</label>
+                            <input type="number" class="form-control" name="amount" placeholder="1500" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-secondary">Month</label>
+                            <input type="text" class="form-control" name="month" placeholder="October 2026" required>
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" name="is_paid" id="feePaidSwitch" checked>
+                        <label class="form-check-label small fw-semibold" for="feePaidSwitch">Fee Already Paid</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
