@@ -22,7 +22,6 @@ def is_password_strong(password):
         return False, "Password mein kam se kam ek digit, ek symbol, aur ek alphabet hona chahiye!"
     return True, ""
 
-
 def signup_view(request):
     batches = Batch.objects.all()
 
@@ -39,23 +38,28 @@ def signup_view(request):
         child_identifier = request.POST.get('child_identifier', '').strip()
         terms_accepted = request.POST.get('terms')
 
+        # Helper context builder to preserve form inputs
+        def get_err_ctx(msg):
+            return {
+                'error': msg,
+                'batches': batches,
+                'form_data': request.POST,
+                'selected_batch_ids': batch_ids
+            }
+
         if not all([full_name, username, email, mobile, password, confirm_password, role]):
-            return render(request, 'signup.html', {'error': 'Bhai, saare fields bharna zaroori hai!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Bhai, saare fields bharna zaroori hai!'))
 
         if not terms_accepted:
-            return render(request, 'signup.html', {'error': 'Bhai, aage badhne ke liye Terms & Service agree karna zaroori hai!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Bhai, aage badhne ke liye Terms & Service agree karna zaroori hai!'))
 
         if len(mobile) < 10 or not mobile.replace('+', '').replace(' ', '').isdigit():
-            return render(request, 'signup.html', {'error': 'Bhai, valid mobile number enter karo!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Bhai, valid mobile number enter karo!'))
 
-       
         matched_child = None
         if role == 'PARENT':
             if not child_identifier:
-                return render(request, 'signup.html', {
-                    'error': 'Parent registration ke liye bache ka Registered Mobile No ya Username daalna zaroori hai!',
-                    'batches': batches
-                })
+                return render(request, 'signup.html', get_err_ctx('Parent registration ke liye bache ka Registered Mobile No ya Username daalna zaroori hai!'))
 
             matched_child = UserProfile.objects.filter(
                 Q(username=child_identifier.lower()) | Q(mobile=child_identifier),
@@ -63,11 +67,7 @@ def signup_view(request):
             ).first()
 
             if not matched_child:
-                return render(request, 'signup.html', {
-                    'error': f'"{child_identifier}" se koi registered student nahi mila! Kripya sahi Mobile Number ya Username dalein.',
-                    'batches': batches
-                })
-        # ---------------------------------------
+                return render(request, 'signup.html', get_err_ctx(f'"{child_identifier}" se koi registered student nahi mila! Kripya sahi Mobile Number ya Username dalein.'))
 
         # Junk cleanup for unverified data on re-attempts
         UserProfile.objects.filter(email=email, is_verified=False).delete()
@@ -75,20 +75,20 @@ def signup_view(request):
         UserProfile.objects.filter(mobile=mobile, is_verified=False).delete()
 
         if UserProfile.objects.filter(username=username, is_verified=True).exists():
-            return render(request, 'signup.html', {'error': 'Bhai, ye username pehle se kisi ne le rakha hai!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Bhai, ye username pehle se kisi ne le rakha hai!'))
 
         if UserProfile.objects.filter(email=email, is_verified=True).exists():
-            return render(request, 'signup.html', {'error': 'Ye email pehle se register hai!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Ye email pehle se register hai!'))
 
         if UserProfile.objects.filter(mobile=mobile, is_verified=True).exists():
-            return render(request, 'signup.html', {'error': 'Bhai, ye mobile number pehle se use ho raha hai!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Bhai, ye mobile number pehle se use ho raha hai!'))
 
         if password != confirm_password:
-            return render(request, 'signup.html', {'error': 'Dono password match nahi kar rahe!', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx('Dono password match nahi kar rahe!'))
             
         is_strong, msg = is_password_strong(password)
         if not is_strong:   
-            return render(request, 'signup.html', {'error': msg, 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx(msg))
 
         otp_code = str(random.randint(100000, 999999))
         
@@ -106,7 +106,7 @@ def signup_view(request):
                     otp=otp_code,
                     otp_created_at=timezone.now(),
                     is_verified=False,
-                    child=matched_child if role == 'PARENT' else None  # Auto-link child here
+                    child=matched_child if role == 'PARENT' else None
                 )
 
                 # Student hone par selected batch me add karo
@@ -128,7 +128,7 @@ def signup_view(request):
                 return redirect('verify_otp')
                 
         except Exception as e:
-            return render(request, 'signup.html', {'error': f'Technical error! Data save ya email bhejne me dikkat aayi: {e}', 'batches': batches})
+            return render(request, 'signup.html', get_err_ctx(f'Technical error! Data save ya email bhejne me dikkat aayi: {e}'))
 
     return render(request, 'signup.html', {'batches': batches})
 # ==========================================
